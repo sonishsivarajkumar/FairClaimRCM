@@ -1,0 +1,110 @@
+{
+  "codes": {
+    "99213": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, typically 15 minutes",
+      "category": "Evaluation and Management",
+      "base_rvu": 1.3,
+      "keywords": ["office visit", "outpatient", "established patient", "evaluation", "management", "E&M"]
+    },
+    "99214": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, typically 25 minutes",
+      "category": "Evaluation and Management",
+      "base_rvu": 2.06,
+      "keywords": ["office visit", "outpatient", "established patient", "evaluation", "management", "complex visit"]
+    },
+    "99223": {
+      "description": "Initial hospital care, per day, comprehensive",
+      "category": "Evaluation and Management",
+      "base_rvu": 3.86,
+      "keywords": ["hospital admission", "initial care", "comprehensive", "inpatient", "admission"]
+    },
+    "99232": {
+      "description": "Subsequent hospital care, per day",
+      "category": "Evaluation and Management",
+      "base_rvu": 2.28,
+      "keywords": ["hospital care", "subsequent", "daily", "inpatient", "rounds"]
+    },
+    "36415": {
+      "description": "Collection of venous blood by venipuncture",
+      "category": "Medicine",
+      "base_rvu": 0.15,
+      "keywords": ["blood draw", "venipuncture", "blood collection", "lab draw", "phlebotomy"]
+    },
+    "93010": {
+      "description": "Electrocardiogram, routine ECG with at least 12 leads; interpretation and report only",
+      "category": "Medicine",
+      "base_rvu": 0.17,
+      "keywords": ["ECG", "EKG", "electrocardiogram", "cardiac monitoring", "heart rhythm"]
+    },
+    "71020": {
+      "description": "Radiologic examination, chest, 2 views, frontal and lateral",
+      "category": "Radiology",
+      "base_rvu": 0.32,
+      "keywords": ["chest x-ray", "chest radiograph", "CXR", "chest imaging", "lung x-ray"]
+    },
+    "74150": {
+      "description": "Computed tomography, abdomen; without contrast material",
+      "category": "Radiology",
+      "base_rvu": 2.45,
+      "keywords": ["CT scan", "computed tomography", "abdomen CT", "abdominal imaging"]
+    },
+    "70553": {
+      "description": "Magnetic resonance imaging, brain; without contrast material, followed by contrast material(s) and further sequences",
+      "category": "Radiology",
+      "base_rvu": 4.89,
+      "keywords": ["MRI", "brain MRI", "magnetic resonance", "neuroimaging"]
+    },
+    "80053": {
+      "description": "Comprehensive metabolic panel",
+      "category": "Pathology and Laboratory",
+      "base_rvu": 0.50,
+      "keywords": ["CMP", "comprehensive metabolic", "blood work", "chemistry panel", "lab work"]
+    },
+    "85025": {
+      "description": "Blood count; complete (CBC), automated and automated differential WBC count",
+      "category": "Pathology and Laboratory",
+      "base_rvu": 0.35,
+      "keywords": ["CBC", "complete blood count", "blood count", "hemogram"]
+    },
+    "45378": {
+      "description": "Colonoscopy, flexible; diagnostic, including collection of specimen(s) by brushing or washing, when performed",
+      "category": "Surgery",
+      "base_rvu": 4.43,
+      "keywords": ["colonoscopy", "endoscopy", "colon examination", "flexible scope", "lower GI"]
+    },
+    "43239": {
+      "description": "Esophagogastroduodenoscopy, flexible, transoral; with biopsy, single or multiple",
+      "category": "Surgery",
+      "base_rvu": 3.21,
+      "keywords": ["EGD", "upper endoscopy", "esophagogastroduodenoscopy", "upper GI scope"]
+    },
+    "47562": {
+      "description": "Laparoscopy, surgical; cholecystectomy",
+      "category": "Surgery",
+      "base_rvu": 12.35,
+      "keywords": ["laparoscopic cholecystectomy", "gallbladder removal", "lap chole", "surgery"]
+    },
+    "76700": {
+      "description": "Ultrasound, abdominal, real time with image documentation; complete",
+      "category": "Radiology",
+      "base_rvu": 1.89,
+      "keywords": ["ultrasound", "abdominal ultrasound", "sonogram", "US abdomen"]
+    }
+  },
+  "keyword_mappings": {
+    "office visit": [{"code": "99213", "confidence": 0.8, "match_type": "keyword"}, {"code": "99214", "confidence": 0.7, "match_type": "keyword"}],
+    "hospital admission": [{"code": "99223", "confidence": 0.9, "match_type": "keyword"}],
+    "blood draw": [{"code": "36415", "confidence": 0.9, "match_type": "keyword"}],
+    "ECG": [{"code": "93010", "confidence": 0.9, "match_type": "keyword"}],
+    "EKG": [{"code": "93010", "confidence": 0.9, "match_type": "keyword"}],
+    "chest x-ray": [{"code": "71020", "confidence": 0.9, "match_type": "keyword"}],
+    "CXR": [{"code": "71020", "confidence": 0.9, "match_type": "keyword"}],
+    "CT scan": [{"code": "74150", "confidence": 0.8, "match_type": "keyword"}],
+    "MRI": [{"code": "70553", "confidence": 0.8, "match_type": "keyword"}],
+    "lab work": [{"code": "80053", "confidence": 0.7, "match_type": "keyword"}],
+    "blood work": [{"code": "80053", "confidence": 0.7, "match_type": "keyword"}, {"code": "85025", "confidence": 0.8, "match_type": "keyword"}],
+    "colonoscopy": [{"code": "45378", "confidence": 0.9, "match_type": "keyword"}],
+    "endoscopy": [{"code": "45378", "confidence": 0.7, "match_type": "keyword"}, {"code": "43239", "confidence": 0.8, "match_type": "keyword"}],
+    "ultrasound": [{"code": "76700", "confidence": 0.8, "match_type": "keyword"}]
+  }
+}

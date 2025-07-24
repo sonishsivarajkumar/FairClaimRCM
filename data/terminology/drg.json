@@ -1,0 +1,176 @@
+{
+  "drgs": {
+    "280": {
+      "description": "Acute Myocardial Infarction, Discharged Alive with MCC",
+      "mdc": "05",
+      "mdc_description": "Diseases and Disorders of the Circulatory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 4.8,
+      "base_weight": 2.3456,
+      "relative_weight": 2.3456,
+      "primary_diagnoses": ["I21.0", "I21.1", "I21.2", "I21.9", "I22.0", "I22.1", "I22.2", "I22.8", "I22.9"]
+    },
+    "281": {
+      "description": "Acute Myocardial Infarction, Discharged Alive with CC",
+      "mdc": "05",
+      "mdc_description": "Diseases and Disorders of the Circulatory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 3.2,
+      "base_weight": 1.4567,
+      "relative_weight": 1.4567,
+      "primary_diagnoses": ["I21.0", "I21.1", "I21.2", "I21.9", "I22.0", "I22.1", "I22.2", "I22.8", "I22.9"]
+    },
+    "282": {
+      "description": "Acute Myocardial Infarction, Discharged Alive without CC/MCC",
+      "mdc": "05",
+      "mdc_description": "Diseases and Disorders of the Circulatory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 2.1,
+      "base_weight": 0.9234,
+      "relative_weight": 0.9234,
+      "primary_diagnoses": ["I21.0", "I21.1", "I21.2", "I21.9", "I22.0", "I22.1", "I22.2", "I22.8", "I22.9"]
+    },
+    "190": {
+      "description": "Chronic Obstructive Pulmonary Disease with MCC",
+      "mdc": "04",
+      "mdc_description": "Diseases and Disorders of the Respiratory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 4.5,
+      "base_weight": 1.8901,
+      "relative_weight": 1.8901,
+      "primary_diagnoses": ["J44.0", "J44.1", "J44.9", "J43.0", "J43.1", "J43.2", "J43.8", "J43.9"]
+    },
+    "191": {
+      "description": "Chronic Obstructive Pulmonary Disease with CC",
+      "mdc": "04",
+      "mdc_description": "Diseases and Disorders of the Respiratory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 3.1,
+      "base_weight": 1.2345,
+      "relative_weight": 1.2345,
+      "primary_diagnoses": ["J44.0", "J44.1", "J44.9", "J43.0", "J43.1", "J43.2", "J43.8", "J43.9"]
+    },
+    "192": {
+      "description": "Chronic Obstructive Pulmonary Disease without CC/MCC",
+      "mdc": "04",
+      "mdc_description": "Diseases and Disorders of the Respiratory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 2.2,
+      "base_weight": 0.8901,
+      "relative_weight": 0.8901,
+      "primary_diagnoses": ["J44.0", "J44.1", "J44.9", "J43.0", "J43.1", "J43.2", "J43.8", "J43.9"]
+    },
+    "177": {
+      "description": "Respiratory Infections and Inflammations with MCC",
+      "mdc": "04",
+      "mdc_description": "Diseases and Disorders of the Respiratory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 6.2,
+      "base_weight": 2.8765,
+      "relative_weight": 2.8765,
+      "primary_diagnoses": ["J18.0", "J18.1", "J18.2", "J18.8", "J18.9", "J15.0", "J15.1", "J15.2"]
+    },
+    "178": {
+      "description": "Respiratory Infections and Inflammations with CC",
+      "mdc": "04",
+      "mdc_description": "Diseases and Disorders of the Respiratory System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 4.1,
+      "base_weight": 1.6543,
+      "relative_weight": 1.6543,
+      "primary_diagnoses": ["J18.0", "J18.1", "J18.2", "J18.8", "J18.9", "J15.0", "J15.1", "J15.2"]
+    },
+    "638": {
+      "description": "Diabetes with CC",
+      "mdc": "10",
+      "mdc_description": "Endocrine, Nutritional and Metabolic Diseases and Disorders",
+      "type": "MEDICAL",
+      "geometric_mean_los": 3.8,
+      "base_weight": 1.1567,
+      "relative_weight": 1.1567,
+      "primary_diagnoses": ["E11.0", "E11.1", "E11.9", "E10.0", "E10.1", "E10.9"]
+    },
+    "639": {
+      "description": "Diabetes without CC/MCC",
+      "mdc": "10",
+      "mdc_description": "Endocrine, Nutritional and Metabolic Diseases and Disorders",
+      "type": "MEDICAL",
+      "geometric_mean_los": 2.4,
+      "base_weight": 0.7890,
+      "relative_weight": 0.7890,
+      "primary_diagnoses": ["E11.0", "E11.1", "E11.9", "E10.0", "E10.1", "E10.9"]
+    },
+    "682": {
+      "description": "Renal Failure with MCC",
+      "mdc": "11",
+      "mdc_description": "Diseases and Disorders of the Kidney and Urinary Tract",
+      "type": "MEDICAL",
+      "geometric_mean_los": 5.2,
+      "base_weight": 2.1234,
+      "relative_weight": 2.1234,
+      "primary_diagnoses": ["N18.5", "N18.6", "N19", "N17.0", "N17.1", "N17.2", "N17.8", "N17.9"]
+    },
+    "683": {
+      "description": "Renal Failure with CC",
+      "mdc": "11",
+      "mdc_description": "Diseases and Disorders of the Kidney and Urinary Tract",
+      "type": "MEDICAL",
+      "geometric_mean_los": 3.6,
+      "base_weight": 1.3456,
+      "relative_weight": 1.3456,
+      "primary_diagnoses": ["N18.5", "N18.6", "N19", "N17.0", "N17.1", "N17.2", "N17.8", "N17.9"]
+    },
+    "684": {
+      "description": "Renal Failure without CC/MCC",
+      "mdc": "11",
+      "mdc_description": "Diseases and Disorders of the Kidney and Urinary Tract",
+      "type": "MEDICAL",
+      "geometric_mean_los": 2.3,
+      "base_weight": 0.8765,
+      "relative_weight": 0.8765,
+      "primary_diagnoses": ["N18.5", "N18.6", "N19", "N17.0", "N17.1", "N17.2", "N17.8", "N17.9"]
+    },
+    "372": {
+      "description": "Major Gastrointestinal Disorders and Peritoneal Infections with MCC",
+      "mdc": "06",
+      "mdc_description": "Diseases and Disorders of the Digestive System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 5.8,
+      "base_weight": 2.4567,
+      "relative_weight": 2.4567,
+      "primary_diagnoses": ["K92.0", "K92.1", "K92.2", "K85.0", "K85.1", "K85.2", "K85.3", "K85.8", "K85.9"]
+    },
+    "373": {
+      "description": "Major Gastrointestinal Disorders and Peritoneal Infections with CC",
+      "mdc": "06",
+      "mdc_description": "Diseases and Disorders of the Digestive System",
+      "type": "MEDICAL",
+      "geometric_mean_los": 3.9,
+      "base_weight": 1.5678,
+      "relative_weight": 1.5678,
+      "primary_diagnoses": ["K92.0", "K92.1", "K92.2", "K85.0", "K85.1", "K85.2", "K85.3", "K85.8", "K85.9"]
+    }
+  },
+  "diagnosis_mappings": {
+    "I21.9": ["280", "281", "282"],
+    "I21.0": ["280", "281", "282"],
+    "I21.1": ["280", "281", "282"],
+    "I21.2": ["280", "281", "282"],
+    "J44.1": ["190", "191", "192"],
+    "J44.0": ["190", "191", "192"],
+    "J44.9": ["190", "191", "192"],
+    "J18.9": ["177", "178"],
+    "J18.0": ["177", "178"],
+    "J18.1": ["177", "178"],
+    "J18.2": ["177", "178"],
+    "E11.9": ["638", "639"],
+    "E11.0": ["638", "639"],
+    "E11.1": ["638", "639"],
+    "N18.6": ["682", "683", "684"],
+    "N19": ["682", "683", "684"],
+    "N17.0": ["682", "683", "684"],
+    "K92.2": ["372", "373"],
+    "K92.0": ["372", "373"],
+    "K92.1": ["372", "373"]
+  }
+}

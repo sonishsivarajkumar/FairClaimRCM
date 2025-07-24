@@ -1,0 +1,106 @@
+{
+  "codes": {
+    "I21.9": {
+      "description": "Acute myocardial infarction, unspecified",
+      "category": "Diseases of the circulatory system",
+      "billable": true,
+      "keywords": ["myocardial infarction", "heart attack", "MI", "chest pain", "cardiac arrest", "STEMI", "NSTEMI"]
+    },
+    "I25.9": {
+      "description": "Chronic ischemic heart disease, unspecified",
+      "category": "Diseases of the circulatory system",
+      "billable": true,
+      "keywords": ["ischemic heart disease", "coronary artery disease", "CAD", "cardiac ischemia"]
+    },
+    "I50.9": {
+      "description": "Heart failure, unspecified",
+      "category": "Diseases of the circulatory system",
+      "billable": true,
+      "keywords": ["heart failure", "congestive heart failure", "CHF", "cardiac failure"]
+    },
+    "J44.1": {
+      "description": "Chronic obstructive pulmonary disease with acute exacerbation",
+      "category": "Diseases of the respiratory system",
+      "billable": true,
+      "keywords": ["COPD", "chronic obstructive", "breathing difficulty", "shortness of breath", "emphysema", "bronchitis"]
+    },
+    "J18.9": {
+      "description": "Pneumonia, unspecified organism",
+      "category": "Diseases of the respiratory system",
+      "billable": true,
+      "keywords": ["pneumonia", "lung infection", "respiratory infection", "chest infection"]
+    },
+    "R06.2": {
+      "description": "Dyspnea, unspecified",
+      "category": "Symptoms, signs and abnormal clinical and laboratory findings",
+      "billable": true,
+      "keywords": ["dyspnea", "shortness of breath", "breathing difficulty", "SOB"]
+    },
+    "N18.6": {
+      "description": "End stage renal disease",
+      "category": "Diseases of the genitourinary system",
+      "billable": true,
+      "keywords": ["kidney failure", "renal failure", "dialysis", "ESRD", "chronic kidney disease"]
+    },
+    "N19": {
+      "description": "Unspecified kidney failure",
+      "category": "Diseases of the genitourinary system",
+      "billable": true,
+      "keywords": ["kidney failure", "renal failure", "acute kidney injury", "AKI"]
+    },
+    "N03.9": {
+      "description": "Chronic nephritic syndrome with unspecified morphologic changes",
+      "category": "Diseases of the genitourinary system",
+      "billable": true,
+      "keywords": ["nephritis", "kidney inflammation", "glomerulonephritis"]
+    },
+    "E11.9": {
+      "description": "Type 2 diabetes mellitus without complications",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "billable": true,
+      "keywords": ["diabetes", "blood sugar", "hyperglycemia", "diabetic", "type 2 diabetes"]
+    },
+    "E11.65": {
+      "description": "Type 2 diabetes mellitus with hyperglycemia",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "billable": true,
+      "keywords": ["diabetes", "hyperglycemia", "high blood sugar", "diabetic"]
+    },
+    "E11.40": {
+      "description": "Type 2 diabetes mellitus with diabetic neuropathy, unspecified",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "billable": true,
+      "keywords": ["diabetes", "neuropathy", "diabetic neuropathy", "nerve damage"]
+    },
+    "K92.2": {
+      "description": "Gastrointestinal hemorrhage, unspecified",
+      "category": "Diseases of the digestive system",
+      "billable": true,
+      "keywords": ["GI bleed", "gastrointestinal bleeding", "blood in stool", "hematemesis", "melena"]
+    },
+    "R50.9": {
+      "description": "Fever, unspecified",
+      "category": "Symptoms, signs and abnormal clinical and laboratory findings",
+      "billable": true,
+      "keywords": ["fever", "pyrexia", "elevated temperature", "febrile"]
+    },
+    "M79.3": {
+      "description": "Panniculitis, unspecified",
+      "category": "Diseases of the musculoskeletal system and connective tissue",
+      "billable": true,
+      "keywords": ["panniculitis", "inflammation", "subcutaneous tissue"]
+    }
+  },
+  "keyword_mappings": {
+    "myocardial infarction": [{"code": "I21.9", "confidence": 0.9, "match_type": "keyword"}],
+    "heart attack": [{"code": "I21.9", "confidence": 0.9, "match_type": "keyword"}],
+    "MI": [{"code": "I21.9", "confidence": 0.8, "match_type": "keyword"}],
+    "chest pain": [{"code": "I21.9", "confidence": 0.6, "match_type": "keyword"}],
+    "COPD": [{"code": "J44.1", "confidence": 0.9, "match_type": "keyword"}],
+    "shortness of breath": [{"code": "J44.1", "confidence": 0.7, "match_type": "keyword"}, {"code": "R06.2", "confidence": 0.8, "match_type": "keyword"}],
+    "kidney failure": [{"code": "N18.6", "confidence": 0.8, "match_type": "keyword"}, {"code": "N19", "confidence": 0.7, "match_type": "keyword"}],
+    "diabetes": [{"code": "E11.9", "confidence": 0.8, "match_type": "keyword"}],
+    "pneumonia": [{"code": "J18.9", "confidence": 0.9, "match_type": "keyword"}],
+    "fever": [{"code": "R50.9", "confidence": 0.8, "match_type": "keyword"}]
+  }
+}

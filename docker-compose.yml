@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:13
+    container_name: fairclaimrcm-postgres
+    environment:
+      POSTGRES_DB: fairclaimrcm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fairclaimrcm-network
+
+  # Elasticsearch for search and analytics
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: fairclaimrcm-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - fairclaimrcm-network
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: fairclaimrcm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fairclaimrcm-network
+
+  # FairClaimRCM API
+  api:
+    build: .
+    container_name: fairclaimrcm-api
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/fairclaimrcm
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - DEBUG=true
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - elasticsearch
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    networks:
+      - fairclaimrcm-network
+    restart: unless-stopped
+
+  # Web UI (placeholder for future React app)
+  web-ui:
+    image: nginx:alpine
+    container_name: fairclaimrcm-web-ui
+    ports:
+      - "3000:80"
+    volumes:
+      - ./web-ui/build:/usr/share/nginx/html
+      - ./web-ui/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - api
+    networks:
+      - fairclaimrcm-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  elasticsearch_data:
+  redis_data:
+
+networks:
+  fairclaimrcm-network:
+    driver: bridge
