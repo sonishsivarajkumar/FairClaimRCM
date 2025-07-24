@@ -29,8 +29,8 @@
   - `/api/v1/terminology/drg/{code}` - Get specific DRG code
 
 ### Coding Engine
-- ✅ **ML-Assisted Code Predictor**: Basic prediction logic with confidence scoring
-- ✅ **Coding Service**: Generates recommendations from clinical text
+- ✅ **Rule-Based Code Predictor**: Pattern matching and keyword-based recommendations
+- ✅ **Coding Service**: Generates recommendations from clinical text using terminology matching
 - ✅ **Coding API Endpoints**:
   - `/api/v1/coding/analyze` - Analyze clinical text and generate recommendations
   - `/api/v1/coding/validate` - Validate sets of medical codes
@@ -73,10 +73,16 @@
 
 ## 🚧 Partially Implemented
 
-### Machine Learning
-- 🟡 **Basic ML Predictor**: Simple rule-based + ML hybrid approach
-- 🟡 **Confidence Scoring**: Basic confidence calculation
-- ⚠️ **Note**: ML component needs enhancement with real training data
+### Rule-Based Coding Intelligence
+- ✅ **Pattern Matching**: Keyword and phrase-based code suggestions
+- ✅ **Terminology Mapping**: Direct mapping from clinical terms to codes
+- ✅ **Confidence Scoring**: Rule-based confidence calculation
+- ⚠️ **Note**: Uses deterministic rules rather than ML due to lack of training data
+
+### Machine Learning (Future Enhancement)
+- ❌ **ML Models**: No trained models due to lack of clinical datasets
+- ❌ **Deep Learning**: Requires large annotated medical records
+- ⚠️ **Note**: Current "ML" is rule-based; true ML requires proprietary clinical data
 
 ### Reimbursement Engine
 - 🟡 **Basic Estimation**: Simple fee schedule lookup

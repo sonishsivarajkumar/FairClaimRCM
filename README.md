@@ -6,7 +6,7 @@
 
 **Make inpatient coding and claims adjudication transparent, accurate, and auditable—so providers get paid fairly and payers see exactly why each dollar posts.**
 
-> **Development Status**: ✅ **v0.1 MVP Complete!** This implementation includes a fully functional API with 25+ endpoints, comprehensive terminology services, ML-assisted coding recommendations, claims management, audit logging, and a complete test suite. Ready for development, testing, and production deployment!
+> **Development Status**: ✅ **v0.2 Complete!** This implementation includes a fully functional API with 25+ endpoints, comprehensive terminology services, rule-based coding recommendations, claims management, audit logging, and a complete test suite. Note: True ML capabilities require access to clinical training data not available in open source.
 
 ## Mission
 
@@ -14,7 +14,7 @@ FairClaimRCM is an open-source healthcare revenue cycle management system that b
 
 ## Key Features
 
-- ✅ **Transparent Coding**: AI-assisted medical coding with complete audit trails
+- ✅ **Transparent Coding**: Rule-based medical coding with complete audit trails
 - ✅ **Explainable AI**: Every coding decision comes with human-readable explanations
 - ✅ **Audit-Ready**: Full compliance tracking and documentation
 - ✅ **Extensible**: Modular architecture for easy customization
@@ -31,7 +31,7 @@ FairClaimRCM is an open-source healthcare revenue cycle management system that b
 | Module | Responsibility | Status |
 |--------|----------------|--------|
 | **Terminology & Mapping** | ICD-10, CPT, DRG lookup service with version tracking | ✅ Complete |
-| **Code Recommendation** | Rule-based + ML-assisted code suggestion with confidence scoring | ✅ Complete |
+| **Code Recommendation** | Rule-based + pattern matching code suggestion with confidence scoring | ✅ Complete |
 | **Audit & Explainability** | Per-claim "why this code" reports with decision traces | ✅ Complete |
 | **Claims Validation API** | REST endpoints for chart submission and claim processing | ✅ Complete |
 | **Reimbursement Engine** | Fee schedule processing and reimbursement simulation | 🟡 Basic |
@@ -165,7 +165,7 @@ We welcome contributions from the healthcare and software development communitie
 
 ### v0.1 (MVP) - Core Coding Engine ✅ **COMPLETED**
 - ✅ **Basic ICD-10/CPT/DRG lookup service** - Full search and validation
-- ✅ **Rule-based coding suggestions** - ML-assisted recommendations
+- ✅ **Rule-based coding suggestions** - Pattern matching and terminology mapping
 - ✅ **REST API for code validation** - 25+ endpoints across 4 modules
 - ✅ **Basic audit logging** - Comprehensive audit trails
 - ✅ **Claims management** - Full CRUD operations
@@ -173,13 +173,12 @@ We welcome contributions from the healthcare and software development communitie
 - ✅ **Test infrastructure** - Unit, integration, performance tests
 - ✅ **Docker support** - Container deployment ready
 
-### v0.2 - Enhanced Intelligence 🚧 **IN PROGRESS**
-- ✅ **ML-powered code recommendations** - Basic implementation
-- ✅ **Confidence scoring** - Initial confidence calculation
+### v0.2 - Enhanced Intelligence ✅ **COMPLETED**
+- ✅ **Rule-based code recommendations** - Deterministic pattern matching
+- ✅ **Confidence scoring** - Rule-based confidence calculation
 - ✅ **Detailed audit reports** - Per-claim audit trails
-- 🟡 **Batch processing capabilities** - Basic batch API endpoint
-- ⏳ **Enhanced ML training** - Real clinical data integration
-- ⏳ **Improved reimbursement engine** - Comprehensive fee schedules
+- ✅ **Batch processing capabilities** - Basic batch API endpoint
+- ⚠️ **Note**: ML capabilities limited by lack of training data
 
 ### v0.3 - Web Interface & Analytics
 - ⏳ **React web UI dashboard** - Interactive interface
@@ -187,13 +186,17 @@ We welcome contributions from the healthcare and software development communitie
 - ⏳ **Real-time monitoring** - System performance metrics
 - ⏳ **User management** - Multi-user support
 - ⏳ **Enhanced batch processing** - Large-scale claim processing
+- ⏳ **Improved reimbursement engine** - Comprehensive fee schedules
+
+### v1.0+ - Advanced Features (Requires Clinical Data Partnership)
+- ⏳ **True ML Models** - Requires access to annotated clinical datasets
+- ⏳ **Deep Learning Coding** - Natural language processing for clinical text
 
 ### v1.0 - Full Platform
 - ⏳ **HL7/FHIR integration** - Healthcare data standards
 - ⏳ **EHR connectors** - Direct EHR integration
 - ⏳ **Multi-tenant support** - Organization management
 - ⏳ **Enterprise features** - SSO, advanced security
-- ⏳ **Advanced AI models** - Deep learning for coding
 - ⏳ **Real-time data feeds** - Live terminology updates
 
 **Legend**: ✅ Complete | 🟡 Partial | 🚧 In Progress | ⏳ Planned
@@ -201,12 +204,34 @@ We welcome contributions from the healthcare and software development communitie
 ## Tech Stack
 
 - **Backend**: Python + FastAPI
-- **Frontend**: React + Tailwind CSS
-- **Database**: PostgreSQL + Elasticsearch
-- **ML/AI**: scikit-learn, transformers
+- **Frontend**: React + Tailwind CSS (planned)
+- **Database**: PostgreSQL + SQLite
+- **Coding Engine**: Rule-based pattern matching
 - **Rules Engine**: JSON-based rule definitions
 - **Containerization**: Docker + Docker Compose
 - **CI/CD**: GitHub Actions
+
+**Note**: ML/AI capabilities (scikit-learn, transformers) are present but limited by lack of training data. Current coding recommendations use deterministic rule-based approaches.
+
+## Machine Learning Considerations
+
+**Current Approach**: FairClaimRCM uses **rule-based intelligence** rather than machine learning due to the lack of available clinical training data. The system provides:
+
+- ✅ **Pattern Matching**: Keywords and phrases mapped to medical codes
+- ✅ **Terminology Matching**: Direct clinical term to code relationships  
+- ✅ **Confidence Scoring**: Rule-based confidence calculation
+- ✅ **Explainable Results**: Clear reasoning for each recommendation
+
+**Why Not "True" ML?**: 
+- 🔒 **Clinical Data Privacy**: Real patient data requires HIPAA compliance and partnerships
+- 💰 **Commercial Datasets**: Proprietary medical coding datasets are expensive
+- 📊 **Annotation Complexity**: Medical coding requires expert clinical knowledge
+
+**Future ML Enhancement Path**:
+- 🤝 **Healthcare Partnerships**: Collaborate with healthcare organizations
+- 📚 **Synthetic Data**: Generate realistic but artificial clinical scenarios
+- 🔄 **Federated Learning**: Train models without centralizing sensitive data
+- 📖 **Public Datasets**: Utilize available medical literature and code mappings
 
 ## License
 
