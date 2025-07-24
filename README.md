@@ -168,21 +168,4 @@ FairClaimRCM is designed with healthcare compliance in mind:
 
 ## Community
 
-- [Discussions](https://github.com/your-org/fairclaimrcm/discussions)
-- [Mailing List](mailto:fairclaimrcm@yourorg.com)
-- [Twitter](https://twitter.com/fairclaimrcm)
-- [LinkedIn](https://linkedin.com/company/fairclaimrcm)
-
-## Use Cases
-
-- **Healthcare Providers**: Improve coding accuracy and reduce claim denials
-- **RCM Companies**: Add transparency to client reporting
-- **Payers**: Validate claims with clear audit trails
-- **Consultants**: Analyze coding patterns and optimize workflows
-- **Researchers**: Study healthcare coding patterns and outcomes
-
----
-
-**Made with dedication for the healthcare community**
-
-*FairClaimRCM - Because every claim deserves a fair and transparent review.*
+- [Discussions](https://github.com/your-org/fairclaimrcm/discus

@@ -1,206 +1,595 @@
-# FairClaimRCM Implementation Summary 🏥
+/*
+ * This is a convenience header file providing compatibility utilities
+ * for supporting different minor versions of Python 3.
+ * It was originally used to support the transition from Python 2,
+ * hence the "3k" naming.
+ *
+ * If you want to use this for your own projects, it's recommended to make a
+ * copy of it. Although the stuff below is unlikely to change, we don't provide
+ * strong backwards compatibility guarantees at the moment.
+ */
 
-## What We've Built
+#ifndef NUMPY_CORE_INCLUDE_NUMPY_NPY_3KCOMPAT_H_
+#define NUMPY_CORE_INCLUDE_NUMPY_NPY_3KCOMPAT_H_
 
-I've successfully implemented a comprehensive MVP of FairClaimRCM based on your blueprint. Here's what's been created:
+#include <Python.h>
+#include <stdio.h>
 
-### ✅ **Core Architecture**
+#ifndef NPY_PY3K
+#define NPY_PY3K 1
+#endif
 
-1. **FastAPI Backend** (`api/`)
-   - Main application entry point (`main.py`)
-   - RESTful API endpoints for claims, coding, terminology, and audit
-   - Pydantic schemas for request/response validation
-   - SQLAlchemy database models
+#include "numpy/npy_common.h"
+#include "numpy/ndarrayobject.h"
 
-2. **Core Services** (`core/`)
-   - **ICD-10 Service**: Diagnosis code lookup and validation
-   - **CPT Service**: Procedure code management  
-   - **DRG Service**: Grouper logic and reimbursement calculation
-   - **ML Code Predictor**: Basic machine learning for code recommendations
-   - **Configuration Management**: Environment-based settings
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-3. **API Endpoints**
-   - `/api/v1/claims/` - Claim management
-   - `/api/v1/coding/` - Code recommendations and validation
-   - `/api/v1/terminology/` - Medical code lookup and search
-   - `/api/v1/audit/` - Audit trails and compliance reporting
+/*
+ * PyInt -> PyLong
+ */
 
-### ✅ **Key Features Implemented**
 
-- **🔍 Transparent Coding**: Rule-based + ML code suggestions with confidence scores
-- **📊 Explainable AI**: Human-readable explanations for every recommendation
-- **💯 Audit-Ready**: Complete audit logging for all actions
-- **🔧 Extensible**: Modular architecture for easy customization
-- **🌐 Standards-Compliant**: ICD-10, CPT, and DRG terminology support
-- **⚡ Fast API**: RESTful endpoints with automatic documentation
+/*
+ * This is a renamed copy of the Python non-limited API function _PyLong_AsInt. It is
+ * included here because it is missing from the PyPy API. It completes the PyLong_As*
+ * group of functions and can be useful in replacing PyInt_Check.
+ */
+static inline int
+Npy__PyLong_AsInt(PyObject *obj)
+{
+    int overflow;
+    long result = PyLong_AsLongAndOverflow(obj, &overflow);
 
-### ✅ **Sample Data & Examples**
+    /* INT_MAX and INT_MIN are defined in Python.h */
+    if (overflow || result > INT_MAX || result < INT_MIN) {
+        /* XXX: could be cute and give a different
+           message for overflow == -1 */
+        PyErr_SetString(PyExc_OverflowError,
+                        "Python int too large to convert to C int");
+        return -1;
+    }
+    return (int)result;
+}
 
-- Sample ICD-10, CPT, and DRG terminology data
-- Clinical documentation examples
-- API usage scripts (`examples/basic_api_usage.py`)
-- Command-line interface (`cli.py`)
-- Comprehensive test suite
 
-### ✅ **Development Tools**
+#if defined(NPY_PY3K)
+/* Return True only if the long fits in a C long */
+static inline int PyInt_Check(PyObject *op) {
+    int overflow = 0;
+    if (!PyLong_Check(op)) {
+        return 0;
+    }
+    PyLong_AsLongAndOverflow(op, &overflow);
+    return (overflow == 0);
+}
 
-- Docker configuration for easy deployment
-- Environment configuration templates
-- Startup scripts for quick development
-- VS Code task configuration
-- Comprehensive documentation
 
-## 🚀 **Getting Started**
+#define PyInt_FromLong PyLong_FromLong
+#define PyInt_AsLong PyLong_AsLong
+#define PyInt_AS_LONG PyLong_AsLong
+#define PyInt_AsSsize_t PyLong_AsSsize_t
+#define PyNumber_Int PyNumber_Long
 
-### Quick Start (Recommended)
-```bash
-# Make startup script executable and run
-chmod +x start.sh
-./start.sh
-```
+/* NOTE:
+ *
+ * Since the PyLong type is very different from the fixed-range PyInt,
+ * we don't define PyInt_Type -> PyLong_Type.
+ */
+#endif /* NPY_PY3K */
 
-### Manual Setup
-```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
+/* Py3 changes PySlice_GetIndicesEx' first argument's type to PyObject* */
+#ifdef NPY_PY3K
+#  define NpySlice_GetIndicesEx PySlice_GetIndicesEx
+#else
+#  define NpySlice_GetIndicesEx(op, nop, start, end, step, slicelength) \
+    PySlice_GetIndicesEx((PySliceObject *)op, nop, start, end, step, slicelength)
+#endif
 
-# Install dependencies
-pip install -r requirements.txt
+#if PY_VERSION_HEX < 0x030900a4
+    /* Introduced in https://github.com/python/cpython/commit/d2ec81a8c99796b51fb8c49b77a7fe369863226f */
+    #define Py_SET_TYPE(obj, type) ((Py_TYPE(obj) = (type)), (void)0)
+    /* Introduced in https://github.com/python/cpython/commit/b10dc3e7a11fcdb97e285882eba6da92594f90f9 */
+    #define Py_SET_SIZE(obj, size) ((Py_SIZE(obj) = (size)), (void)0)
+    /* Introduced in https://github.com/python/cpython/commit/c86a11221df7e37da389f9c6ce6e47ea22dc44ff */
+    #define Py_SET_REFCNT(obj, refcnt) ((Py_REFCNT(obj) = (refcnt)), (void)0)
+#endif
 
-# Configure environment
-cp .env.example .env
 
-# Start API server
-cd api && python3 -m uvicorn main:app --reload
-```
+#define Npy_EnterRecursiveCall(x) Py_EnterRecursiveCall(x)
 
-### Using Docker
-```bash
-docker-compose up -d
-```
+/*
+ * PyString -> PyBytes
+ */
 
-## 🧪 **Testing the System**
+#if defined(NPY_PY3K)
 
-### 1. Health Check
-```bash
-curl http://localhost:8000/health
-```
+#define PyString_Type PyBytes_Type
+#define PyString_Check PyBytes_Check
+#define PyStringObject PyBytesObject
+#define PyString_FromString PyBytes_FromString
+#define PyString_FromStringAndSize PyBytes_FromStringAndSize
+#define PyString_AS_STRING PyBytes_AS_STRING
+#define PyString_AsStringAndSize PyBytes_AsStringAndSize
+#define PyString_FromFormat PyBytes_FromFormat
+#define PyString_Concat PyBytes_Concat
+#define PyString_ConcatAndDel PyBytes_ConcatAndDel
+#define PyString_AsString PyBytes_AsString
+#define PyString_GET_SIZE PyBytes_GET_SIZE
+#define PyString_Size PyBytes_Size
 
-### 2. CLI Interface
-```bash
-# Analyze clinical text
-python3 cli.py analyze "Patient presents with acute myocardial infarction"
+#define PyUString_Type PyUnicode_Type
+#define PyUString_Check PyUnicode_Check
+#define PyUStringObject PyUnicodeObject
+#define PyUString_FromString PyUnicode_FromString
+#define PyUString_FromStringAndSize PyUnicode_FromStringAndSize
+#define PyUString_FromFormat PyUnicode_FromFormat
+#define PyUString_Concat PyUnicode_Concat2
+#define PyUString_ConcatAndDel PyUnicode_ConcatAndDel
+#define PyUString_GET_SIZE PyUnicode_GET_SIZE
+#define PyUString_Size PyUnicode_Size
+#define PyUString_InternFromString PyUnicode_InternFromString
+#define PyUString_Format PyUnicode_Format
 
-# Validate codes
-python3 cli.py validate --icd10 "I21.9" --cpt "99213"
+#define PyBaseString_Check(obj) (PyUnicode_Check(obj))
 
-# Search terminology
-python3 cli.py search icd10 "chest pain"
-```
+#else
 
-### 3. API Examples
-```bash
-cd examples
-python3 basic_api_usage.py
-```
+#define PyBytes_Type PyString_Type
+#define PyBytes_Check PyString_Check
+#define PyBytesObject PyStringObject
+#define PyBytes_FromString PyString_FromString
+#define PyBytes_FromStringAndSize PyString_FromStringAndSize
+#define PyBytes_AS_STRING PyString_AS_STRING
+#define PyBytes_AsStringAndSize PyString_AsStringAndSize
+#define PyBytes_FromFormat PyString_FromFormat
+#define PyBytes_Concat PyString_Concat
+#define PyBytes_ConcatAndDel PyString_ConcatAndDel
+#define PyBytes_AsString PyString_AsString
+#define PyBytes_GET_SIZE PyString_GET_SIZE
+#define PyBytes_Size PyString_Size
 
-### 4. Interactive API Docs
-Visit: http://localhost:8000/docs
+#define PyUString_Type PyString_Type
+#define PyUString_Check PyString_Check
+#define PyUStringObject PyStringObject
+#define PyUString_FromString PyString_FromString
+#define PyUString_FromStringAndSize PyString_FromStringAndSize
+#define PyUString_FromFormat PyString_FromFormat
+#define PyUString_Concat PyString_Concat
+#define PyUString_ConcatAndDel PyString_ConcatAndDel
+#define PyUString_GET_SIZE PyString_GET_SIZE
+#define PyUString_Size PyString_Size
+#define PyUString_InternFromString PyString_InternFromString
+#define PyUString_Format PyString_Format
 
-## 📋 **Next Steps & Roadmap**
+#define PyBaseString_Check(obj) (PyBytes_Check(obj) || PyUnicode_Check(obj))
 
-### Immediate Next Steps (v0.2)
+#endif /* NPY_PY3K */
 
-1. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+/*
+ * Macros to protect CRT calls against instant termination when passed an
+ * invalid parameter (https://bugs.python.org/issue23524).
+ */
+#if defined _MSC_VER && _MSC_VER >= 1900
 
-2. **Set Up Database**
-   - Configure PostgreSQL or use SQLite for development
-   - Run database migrations
+#include <stdlib.h>
 
-3. **Add Real Terminology Data**
-   - Import official ICD-10-CM codes
-   - Load current CPT codes
-   - Update DRG definitions with latest CMS data
+extern _invalid_parameter_handler _Py_silent_invalid_parameter_handler;
+#define NPY_BEGIN_SUPPRESS_IPH { _invalid_parameter_handler _Py_old_handler = \
+    _set_thread_local_invalid_parameter_handler(_Py_silent_invalid_parameter_handler);
+#define NPY_END_SUPPRESS_IPH _set_thread_local_invalid_parameter_handler(_Py_old_handler); }
 
-4. **Enhance ML Models**
-   - Train models on real clinical data
-   - Implement transformer-based code prediction
-   - Add confidence calibration
+#else
 
-### Short-term Enhancements (v0.3)
+#define NPY_BEGIN_SUPPRESS_IPH
+#define NPY_END_SUPPRESS_IPH
 
-- **Web UI Development**: React dashboard for claims analysis
-- **Advanced Rules Engine**: JSON-based clinical decision rules
-- **HL7/FHIR Integration**: Support for standard healthcare data formats  
-- **Elasticsearch Integration**: Full-text search capabilities
-- **User Authentication**: JWT-based security
-- **Batch Processing**: Handle multiple claims efficiently
+#endif /* _MSC_VER >= 1900 */
 
-### Long-term Vision (v1.0)
 
-- **Enterprise Features**: Multi-tenant support, role-based access
-- **Advanced Analytics**: ML-powered insights and quality metrics
-- **Third-party Integrations**: EHR connectors, billing systems
-- **Compliance Tools**: HIPAA audit reports, SOC 2 compliance
-- **Performance Optimization**: Caching, load balancing
+static inline void
+PyUnicode_ConcatAndDel(PyObject **left, PyObject *right)
+{
+    Py_SETREF(*left, PyUnicode_Concat(*left, right));
+    Py_DECREF(right);
+}
 
-## 🤝 **Contributing**
+static inline void
+PyUnicode_Concat2(PyObject **left, PyObject *right)
+{
+    Py_SETREF(*left, PyUnicode_Concat(*left, right));
+}
 
-The project is structured for easy contribution:
+/*
+ * PyFile_* compatibility
+ */
 
-1. **Add New Code Systems**: Extend `core/terminology/`
-2. **Improve ML Models**: Enhance `core/ml/`
-3. **Add API Endpoints**: Create new routes in `api/routes/`
-4. **Write Tests**: Add tests in `tests/`
-5. **Update Documentation**: Improve `docs/`
+/*
+ * Get a FILE* handle to the file represented by the Python object
+ */
+static inline FILE*
+npy_PyFile_Dup2(PyObject *file, char *mode, npy_off_t *orig_pos)
+{
+    int fd, fd2, unbuf;
+    Py_ssize_t fd2_tmp;
+    PyObject *ret, *os, *io, *io_raw;
+    npy_off_t pos;
+    FILE *handle;
 
-## 🏗️ **Technical Architecture**
+    /* For Python 2 PyFileObject, use PyFile_AsFile */
+#if !defined(NPY_PY3K)
+    if (PyFile_Check(file)) {
+        return PyFile_AsFile(file);
+    }
+#endif
 
-```
-FairClaimRCM/
-├── 🌐 API Layer (FastAPI)
-│   ├── Claims Management
-│   ├── Coding Recommendations  
-│   ├── Terminology Services
-│   └── Audit & Compliance
-├── 🧠 Core Business Logic
-│   ├── Medical Terminology
-│   ├── ML Code Prediction
-│   ├── Rules Engine
-│   └── Reimbursement Calculation
-├── 📊 Data Layer
-│   ├── PostgreSQL (Primary)
-│   ├── Elasticsearch (Search)
-│   └── File-based Terminology
-└── 🔧 Infrastructure
-    ├── Docker Containers
-    ├── Environment Config
-    └── CI/CD Ready
-```
+    /* Flush first to ensure things end up in the file in the correct order */
+    ret = PyObject_CallMethod(file, "flush", "");
+    if (ret == NULL) {
+        return NULL;
+    }
+    Py_DECREF(ret);
+    fd = PyObject_AsFileDescriptor(file);
+    if (fd == -1) {
+        return NULL;
+    }
 
-## 🎯 **Use Cases Ready for Testing**
+    /*
+     * The handle needs to be dup'd because we have to call fclose
+     * at the end
+     */
+    os = PyImport_ImportModule("os");
+    if (os == NULL) {
+        return NULL;
+    }
+    ret = PyObject_CallMethod(os, "dup", "i", fd);
+    Py_DECREF(os);
+    if (ret == NULL) {
+        return NULL;
+    }
+    fd2_tmp = PyNumber_AsSsize_t(ret, PyExc_IOError);
+    Py_DECREF(ret);
+    if (fd2_tmp == -1 && PyErr_Occurred()) {
+        return NULL;
+    }
+    if (fd2_tmp < INT_MIN || fd2_tmp > INT_MAX) {
+        PyErr_SetString(PyExc_IOError,
+                        "Getting an 'int' from os.dup() failed");
+        return NULL;
+    }
+    fd2 = (int)fd2_tmp;
 
-1. **Healthcare Providers**: Test coding accuracy improvements
-2. **RCM Companies**: Evaluate transparency features
-3. **Payers**: Validate audit trail capabilities
-4. **Developers**: Extend with custom rules and models
-5. **Researchers**: Analyze coding patterns and accuracy
+    /* Convert to FILE* handle */
+#ifdef _WIN32
+    NPY_BEGIN_SUPPRESS_IPH
+    handle = _fdopen(fd2, mode);
+    NPY_END_SUPPRESS_IPH
+#else
+    handle = fdopen(fd2, mode);
+#endif
+    if (handle == NULL) {
+        PyErr_SetString(PyExc_IOError,
+                        "Getting a FILE* from a Python file object via "
+                        "_fdopen failed. If you built NumPy, you probably "
+                        "linked with the wrong debug/release runtime");
+        return NULL;
+    }
 
-## 📞 **Support & Documentation**
+    /* Record the original raw file handle position */
+    *orig_pos = npy_ftell(handle);
+    if (*orig_pos == -1) {
+        /* The io module is needed to determine if buffering is used */
+        io = PyImport_ImportModule("io");
+        if (io == NULL) {
+            fclose(handle);
+            return NULL;
+        }
+        /* File object instances of RawIOBase are unbuffered */
+        io_raw = PyObject_GetAttrString(io, "RawIOBase");
+        Py_DECREF(io);
+        if (io_raw == NULL) {
+            fclose(handle);
+            return NULL;
+        }
+        unbuf = PyObject_IsInstance(file, io_raw);
+        Py_DECREF(io_raw);
+        if (unbuf == 1) {
+            /* Succeed if the IO is unbuffered */
+            return handle;
+        }
+        else {
+            PyErr_SetString(PyExc_IOError, "obtaining file position failed");
+            fclose(handle);
+            return NULL;
+        }
+    }
 
-- **API Docs**: http://localhost:8000/docs
-- **Getting Started**: `docs/getting-started.md`
-- **Examples**: `examples/` directory
-- **CLI Help**: `python3 cli.py --help`
+    /* Seek raw handle to the Python-side position */
+    ret = PyObject_CallMethod(file, "tell", "");
+    if (ret == NULL) {
+        fclose(handle);
+        return NULL;
+    }
+    pos = PyLong_AsLongLong(ret);
+    Py_DECREF(ret);
+    if (PyErr_Occurred()) {
+        fclose(handle);
+        return NULL;
+    }
+    if (npy_fseek(handle, pos, SEEK_SET) == -1) {
+        PyErr_SetString(PyExc_IOError, "seeking file failed");
+        fclose(handle);
+        return NULL;
+    }
+    return handle;
+}
 
----
+/*
+ * Close the dup-ed file handle, and seek the Python one to the current position
+ */
+static inline int
+npy_PyFile_DupClose2(PyObject *file, FILE* handle, npy_off_t orig_pos)
+{
+    int fd, unbuf;
+    PyObject *ret, *io, *io_raw;
+    npy_off_t position;
 
-**🎉 The foundation is solid and ready for the next phase of development!**
+    /* For Python 2 PyFileObject, do nothing */
+#if !defined(NPY_PY3K)
+    if (PyFile_Check(file)) {
+        return 0;
+    }
+#endif
 
-This implementation provides a working MVP that demonstrates the core vision of transparent, auditable medical coding. The modular architecture makes it easy to enhance and extend as the project grows.
+    position = npy_ftell(handle);
 
-*Ready to make healthcare revenue cycle management transparent and fair!* 🏥✨
+    /* Close the FILE* handle */
+    fclose(handle);
+
+    /*
+     * Restore original file handle position, in order to not confuse
+     * Python-side data structures
+     */
+    fd = PyObject_AsFileDescriptor(file);
+    if (fd == -1) {
+        return -1;
+    }
+
+    if (npy_lseek(fd, orig_pos, SEEK_SET) == -1) {
+
+        /* The io module is needed to determine if buffering is used */
+        io = PyImport_ImportModule("io");
+        if (io == NULL) {
+            return -1;
+        }
+        /* File object instances of RawIOBase are unbuffered */
+        io_raw = PyObject_GetAttrString(io, "RawIOBase");
+        Py_DECREF(io);
+        if (io_raw == NULL) {
+            return -1;
+        }
+        unbuf = PyObject_IsInstance(file, io_raw);
+        Py_DECREF(io_raw);
+        if (unbuf == 1) {
+            /* Succeed if the IO is unbuffered */
+            return 0;
+        }
+        else {
+            PyErr_SetString(PyExc_IOError, "seeking file failed");
+            return -1;
+        }
+    }
+
+    if (position == -1) {
+        PyErr_SetString(PyExc_IOError, "obtaining file position failed");
+        return -1;
+    }
+
+    /* Seek Python-side handle to the FILE* handle position */
+    ret = PyObject_CallMethod(file, "seek", NPY_OFF_T_PYFMT "i", position, 0);
+    if (ret == NULL) {
+        return -1;
+    }
+    Py_DECREF(ret);
+    return 0;
+}
+
+static inline int
+npy_PyFile_Check(PyObject *file)
+{
+    int fd;
+    /* For Python 2, check if it is a PyFileObject */
+#if !defined(NPY_PY3K)
+    if (PyFile_Check(file)) {
+        return 1;
+    }
+#endif
+    fd = PyObject_AsFileDescriptor(file);
+    if (fd == -1) {
+        PyErr_Clear();
+        return 0;
+    }
+    return 1;
+}
+
+static inline PyObject*
+npy_PyFile_OpenFile(PyObject *filename, const char *mode)
+{
+    PyObject *open;
+    open = PyDict_GetItemString(PyEval_GetBuiltins(), "open");
+    if (open == NULL) {
+        return NULL;
+    }
+    return PyObject_CallFunction(open, "Os", filename, mode);
+}
+
+static inline int
+npy_PyFile_CloseFile(PyObject *file)
+{
+    PyObject *ret;
+
+    ret = PyObject_CallMethod(file, "close", NULL);
+    if (ret == NULL) {
+        return -1;
+    }
+    Py_DECREF(ret);
+    return 0;
+}
+
+
+/* This is a copy of _PyErr_ChainExceptions
+ */
+static inline void
+npy_PyErr_ChainExceptions(PyObject *exc, PyObject *val, PyObject *tb)
+{
+    if (exc == NULL)
+        return;
+
+    if (PyErr_Occurred()) {
+        /* only py3 supports this anyway */
+        #ifdef NPY_PY3K
+            PyObject *exc2, *val2, *tb2;
+            PyErr_Fetch(&exc2, &val2, &tb2);
+            PyErr_NormalizeException(&exc, &val, &tb);
+            if (tb != NULL) {
+                PyException_SetTraceback(val, tb);
+                Py_DECREF(tb);
+            }
+            Py_DECREF(exc);
+            PyErr_NormalizeException(&exc2, &val2, &tb2);
+            PyException_SetContext(val2, val);
+            PyErr_Restore(exc2, val2, tb2);
+        #endif
+    }
+    else {
+        PyErr_Restore(exc, val, tb);
+    }
+}
+
+
+/* This is a copy of _PyErr_ChainExceptions, with:
+ *  - a minimal implementation for python 2
+ *  - __cause__ used instead of __context__
+ */
+static inline void
+npy_PyErr_ChainExceptionsCause(PyObject *exc, PyObject *val, PyObject *tb)
+{
+    if (exc == NULL)
+        return;
+
+    if (PyErr_Occurred()) {
+        /* only py3 supports this anyway */
+        #ifdef NPY_PY3K
+            PyObject *exc2, *val2, *tb2;
+            PyErr_Fetch(&exc2, &val2, &tb2);
+            PyErr_NormalizeException(&exc, &val, &tb);
+            if (tb != NULL) {
+                PyException_SetTraceback(val, tb);
+                Py_DECREF(tb);
+            }
+            Py_DECREF(exc);
+            PyErr_NormalizeException(&exc2, &val2, &tb2);
+            PyException_SetCause(val2, val);
+            PyErr_Restore(exc2, val2, tb2);
+        #endif
+    }
+    else {
+        PyErr_Restore(exc, val, tb);
+    }
+}
+
+/*
+ * PyObject_Cmp
+ */
+#if defined(NPY_PY3K)
+static inline int
+PyObject_Cmp(PyObject *i1, PyObject *i2, int *cmp)
+{
+    int v;
+    v = PyObject_RichCompareBool(i1, i2, Py_LT);
+    if (v == 1) {
+        *cmp = -1;
+        return 1;
+    }
+    else if (v == -1) {
+        return -1;
+    }
+
+    v = PyObject_RichCompareBool(i1, i2, Py_GT);
+    if (v == 1) {
+        *cmp = 1;
+        return 1;
+    }
+    else if (v == -1) {
+        return -1;
+    }
+
+    v = PyObject_RichCompareBool(i1, i2, Py_EQ);
+    if (v == 1) {
+        *cmp = 0;
+        return 1;
+    }
+    else {
+        *cmp = 0;
+        return -1;
+    }
+}
+#endif
+
+/*
+ * PyCObject functions adapted to PyCapsules.
+ *
+ * The main job here is to get rid of the improved error handling
+ * of PyCapsules. It's a shame...
+ */
+static inline PyObject *
+NpyCapsule_FromVoidPtr(void *ptr, void (*dtor)(PyObject *))
+{
+    PyObject *ret = PyCapsule_New(ptr, NULL, dtor);
+    if (ret == NULL) {
+        PyErr_Clear();
+    }
+    return ret;
+}
+
+static inline PyObject *
+NpyCapsule_FromVoidPtrAndDesc(void *ptr, void* context, void (*dtor)(PyObject *))
+{
+    PyObject *ret = NpyCapsule_FromVoidPtr(ptr, dtor);
+    if (ret != NULL && PyCapsule_SetContext(ret, context) != 0) {
+        PyErr_Clear();
+        Py_DECREF(ret);
+        ret = NULL;
+    }
+    return ret;
+}
+
+static inline void *
+NpyCapsule_AsVoidPtr(PyObject *obj)
+{
+    void *ret = PyCapsule_GetPointer(obj, NULL);
+    if (ret == NULL) {
+        PyErr_Clear();
+    }
+    return ret;
+}
+
+static inline void *
+NpyCapsule_GetDesc(PyObject *obj)
+{
+    return PyCapsule_GetContext(obj);
+}
+
+static inline int
+NpyCapsule_Check(PyObject *ptr)
+{
+    return PyCapsule_CheckExact(ptr);
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif  /* NUMPY_CORE_INCLUDE_NUMPY_NPY_3KCOMPAT_H_ */

@@ -91,3 +91,6 @@ docker-compose.override.yml
 # Documentation builds
 docs/_build/
 site/
+
+# Test results
+test-results/
