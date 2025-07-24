@@ -1,0 +1,315 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build and Push Docker Image
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+    
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://fairclaimrcm-staging.example.com
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Deploy to ECS Staging
+      run: |
+        # Update ECS service with new image
+        aws ecs update-service \
+          --cluster fairclaimrcm-staging \
+          --service fairclaimrcm-api \
+          --force-new-deployment \
+          --task-definition fairclaimrcm-staging:${{ github.sha }}
+    
+    - name: Wait for deployment
+      run: |
+        aws ecs wait services-stable \
+          --cluster fairclaimrcm-staging \
+          --services fairclaimrcm-api
+    
+    - name: Run health checks
+      run: |
+        # Wait for service to be ready
+        sleep 60
+        
+        # Health check
+        curl -f https://fairclaimrcm-staging.example.com/health
+        
+        # API smoke tests
+        curl -f https://fairclaimrcm-staging.example.com/api/v1/terminology/icd10/validate/E11.9
+
+  # Integration Tests on Staging
+  staging-tests:
+    name: Staging Integration Tests
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install test dependencies
+      run: |
+        pip install pytest requests
+    
+    - name: Run staging tests
+      env:
+        STAGING_URL: https://fairclaimrcm-staging.example.com
+        API_KEY: ${{ secrets.STAGING_API_KEY }}
+      run: |
+        pytest tests/staging/ -v --tb=short
+
+  # Security Scan on Deployed Image
+  security-scan:
+    name: Security Scan Deployed Image
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    
+    steps:
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ needs.build-and-push.outputs.image-tag }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-staging, staging-tests]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://fairclaimrcm.example.com
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Create deployment backup
+      run: |
+        # Backup current production deployment
+        aws ecs describe-services \
+          --cluster fairclaimrcm-production \
+          --services fairclaimrcm-api \
+          --query 'services[0].taskDefinition' \
+          --output text > previous-task-definition.txt
+        
+        echo "Previous task definition: $(cat previous-task-definition.txt)"
+    
+    - name: Deploy to ECS Production
+      run: |
+        # Blue-green deployment strategy
+        aws ecs update-service \
+          --cluster fairclaimrcm-production \
+          --service fairclaimrcm-api \
+          --force-new-deployment \
+          --task-definition fairclaimrcm-production:${{ github.sha }}
+    
+    - name: Wait for deployment
+      run: |
+        aws ecs wait services-stable \
+          --cluster fairclaimrcm-production \
+          --services fairclaimrcm-api
+    
+    - name: Post-deployment health checks
+      run: |
+        # Wait for service to be ready
+        sleep 120
+        
+        # Comprehensive health checks
+        curl -f https://fairclaimrcm.example.com/health
+        curl -f https://fairclaimrcm.example.com/api/v1/health
+        
+        # API functionality tests
+        curl -f https://fairclaimrcm.example.com/api/v1/terminology/icd10/validate/E11.9
+        curl -f https://fairclaimrcm.example.com/api/v1/terminology/cpt/validate/99213
+    
+    - name: Update load balancer weights
+      run: |
+        # Gradually shift traffic to new deployment
+        echo "Traffic shifting would be implemented here"
+    
+    - name: Notify deployment success
+      run: |
+        # Send notifications (Slack, email, etc.)
+        echo "Deployment to production completed successfully"
+
+  # Post-Deployment Tests
+  production-tests:
+    name: Production Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install test dependencies
+      run: |
+        pip install pytest requests
+    
+    - name: Run production smoke tests
+      env:
+        PRODUCTION_URL: https://fairclaimrcm.example.com
+        API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+      run: |
+        pytest tests/production/ -v --tb=short
+
+  # Rollback on Failure
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy-production, production-tests]
+    if: failure() && (startsWith(github.ref, 'refs/tags/v') || github.event.inputs.environment == 'production')
+    environment:
+      name: production
+    
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Rollback deployment
+      run: |
+        # Get previous task definition
+        PREVIOUS_TASK_DEF=$(aws ecs describe-services \
+          --cluster fairclaimrcm-production \
+          --services fairclaimrcm-api \
+          --query 'services[0].deployments[1].taskDefinition' \
+          --output text)
+        
+        echo "Rolling back to: $PREVIOUS_TASK_DEF"
+        
+        # Update service to previous version
+        aws ecs update-service \
+          --cluster fairclaimrcm-production \
+          --service fairclaimrcm-api \
+          --task-definition $PREVIOUS_TASK_DEF
+    
+    - name: Notify rollback
+      run: |
+        echo "ROLLBACK EXECUTED: Production deployment failed and was rolled back"
+        # Send urgent notifications
+
+  # Deployment Summary
+  deployment-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production, production-tests]
+    if: always()
+    
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "| Environment | Status | Image |" >> $GITHUB_STEP_SUMMARY
+        echo "|-------------|--------|-------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Staging | ${{ needs.deploy-staging.result }} | ${{ needs.build-and-push.outputs.image-tag }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Production | ${{ needs.deploy-production.result }} | ${{ needs.build-and-push.outputs.image-tag }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Post-Deploy Tests | ${{ needs.production-tests.result }} | - |" >> $GITHUB_STEP_SUMMARY
