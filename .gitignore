@@ -1,52 +1,35 @@
-# Environment files
-.env
-*.env.local
+# Dependencies
+web-ui/node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
 # Database files
 *.db
 *.sqlite
 *.sqlite3
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-.venv/
-
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# OS files
 .DS_Store
 .DS_Store?
 ._*
@@ -56,38 +39,57 @@ ehthumbs.db
 Thumbs.db
 
 # Logs
-*.log
 logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Models and cache
-models/
-.cache/
-.pytest_cache/
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
 
-# Coverage reports
+# Temporary folders
+tmp/
+temp/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+build/
+dist/
+*.egg-info/
+
+# Test outputs
+test-results/
 htmlcov/
-.coverage
-.coverage.*
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Virtual environments
+venv/
+env/
+ENV/
+.env/
+.venv/
 
-# pyenv
-.python-version
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
 
-# Docker
-docker-compose.override.yml
+# macOS specific
+*.DS_Store
 
-# Temporary files
-*.tmp
-*.temp
-.tmp/
-.temp/
+# Backup files
+*.bak
+*.backup
+*.orig
 
-# Documentation builds
-docs/_build/
-site/
+# Local development files
+local_settings.py
+instance/
+.webassets-cache

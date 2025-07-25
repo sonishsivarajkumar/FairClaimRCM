@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Coding Button</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .example-text { background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .instructions { background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Testing the Medical Coding Assistant</h1>
+        
+        <div class="instructions">
+            <h3>📋 Test Instructions:</h3>
+            <ol>
+                <li>Open the FairClaimRCM web app at <strong>http://localhost:3001</strong></li>
+                <li>Navigate to the <strong>"Coding"</strong> page (Medical Coding Assistant)</li>
+                <li>Copy and paste any of the example texts below into the text area</li>
+                <li>Click the <strong>"Analyze & Get Codes"</strong> button</li>
+                <li>Verify that coding recommendations appear below</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>🏥 Example 1: Diabetes Case</h2>
+            <div class="example-text">
+                <strong>Text to test:</strong><br>
+                Patient presents with diabetes mellitus type 2, uncontrolled with hyperglycemia. No complications noted. Follow-up visit for established patient.
+            </div>
+            <p><strong>Expected Results:</strong> Should return ICD-10 codes for diabetes (E11.x), CPT codes for office visits (99213), and relevant DRG codes.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>💓 Example 2: Hypertension Case</h2>
+            <div class="example-text">
+                <strong>Text to test:</strong><br>
+                Patient with essential hypertension, blood pressure well controlled on medication. Routine follow-up visit.
+            </div>
+            <p><strong>Expected Results:</strong> Should return ICD-10 code I10 for essential hypertension and appropriate visit codes.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Example 3: General Medical Case</h2>
+            <div class="example-text">
+                <strong>Text to test:</strong><br>
+                Annual physical examination for healthy adult patient. No acute complaints. Preventive care counseling provided.
+            </div>
+            <p><strong>Expected Results:</strong> Should return preventive care codes (Z00.x) and appropriate visit codes.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🩺 Example 4: Mixed Conditions</h2>
+            <div class="example-text">
+                <strong>Text to test:</strong><br>
+                Patient with diabetes and hypertension for routine management. Blood pressure and glucose levels reviewed. Medication adherence discussed.
+            </div>
+            <p><strong>Expected Results:</strong> Should return both diabetes and hypertension codes with management visit codes.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ What to Look For:</h2>
+            <ul>
+                <li><strong>Loading State:</strong> Button should show "Analyzing..." with spinning loader</li>
+                <li><strong>Code Recommendations:</strong> Should display ICD-10, CPT, and DRG codes</li>
+                <li><strong>Confidence Scores:</strong> Each code should have a confidence percentage</li>
+                <li><strong>Descriptions:</strong> Each code should have a readable description</li>
+                <li><strong>Supporting Text:</strong> Should show analysis summary</li>
+                <li><strong>Clear Button:</strong> Should reset all fields when clicked</li>
+            </ul>
+        </div>
+
+        <div class="instructions">
+            <h3>🚀 Quick Test Steps:</h3>
+            <ol>
+                <li>Go to: <a href="http://localhost:3001/coding" target="_blank">http://localhost:3001/coding</a></li>
+                <li>Copy this text: <code>diabetes</code></li>
+                <li>Paste it in the text area</li>
+                <li>Click "Analyze & Get Codes"</li>
+                <li>Watch for the coding recommendations to appear!</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
